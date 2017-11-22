@@ -1,0 +1,152 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
+    }
+}
+
+plugins {
+    id 'nu.studer.jooq' version '2.0.9'
+}
+
+group 'com.projectrake'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'nu.studer.jooq'
+
+sourceCompatibility = 1.9
+targetCompatibility = 1.9
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile fileTree(dir: '../libs', include: '*.jar')
+    compile 'com.zaxxer:HikariCP:2.7.+'
+    compile "io.dropwizard.metrics:metrics-core:3.2.+"
+
+    compile 'mysql:mysql-connector-java:5.1.+'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.1.+'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.2.0'
+
+    compile 'org.jooq:jooq'
+
+    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7'
+    compile group: 'org.jgrapht', name: 'jgrapht-core', version: '1.1.0'
+    compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.2'
+    compile 'javax.annotation:jsr250-api:1.0'
+
+    jooqRuntime group: 'org.postgresql', name: 'postgresql', version: '42.1.+'
+    jooqRuntime group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.2.0'
+    jooqRuntime 'mysql:mysql-connector-java:5.1.+'
+    jooqRuntime group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
+}
+
+jooq {
+    version = '3.10.1' // the default (can be omitted)
+    edition = 'OSS'    // the default (can be omitted), other allowed values are PRO, PRO_JAVA_6, and TRIAL
+
+    rakedev(sourceSets.main) {
+        jdbc {
+            driver = 'org.mariadb.jdbc.Driver'
+            url = 'jdbc:mysql://localhost/rakedev'
+            user = 'rakedev'
+            password = 'rakedev'
+            properties {
+                property {
+                    key = 'ssl'
+                    value = 'true'
+                }
+            }
+        }
+        generator {
+            name = 'org.jooq.util.DefaultGenerator'
+            strategy {
+                name = 'org.jooq.util.DefaultGeneratorStrategy'
+            }
+            database {
+                name = 'org.jooq.util.mariadb.MariaDBDatabase'
+                inputSchema = 'rakedev_template'
+                //outputSchema = 'rakedev'
+                includes = '.*dbm_.*'
+                excludes = ''
+                forcedTypes {
+                    /*
+                    forcedType {
+
+                        name = 'varchar'
+                        expression = '.*'
+                        types = 'JSONB?'
+                    }
+                    forcedType {
+                        name = 'varchar'
+                        expression = '.*'
+                        types = 'INET'
+                    }
+                    */
+                }
+            }
+            generate {
+                relations = true
+                deprecated = false
+                records = true
+                immutablePojos = true
+                fluentSetters = true
+                pojosEqualsAndHashCode = true
+                pojosToString = true
+
+            }
+            target {
+                packageName = 'com.projectrake.dbm.jooq'
+
+            }
+        }
+    }
+}
+
+tasks.generateRakedevJooqSchemaSource.with {
+    def out = new ByteArrayOutputStream()
+    javaExecSpec = { JavaExecSpec s ->
+        s.standardOutput = out
+        s.errorOutput = out
+        s.ignoreExitValue = true
+        s.jvmArgs = ['-XX:+IgnoreUnrecognizedVMOptions', '--add-modules', 'java.xml.bind', 'java.xml.ws.annotation']
+    }
+
+    execResultHandler = { ExecResult r ->
+        if (r.exitValue != 0) {
+            throw new RuntimeException('jOOQ source code generation failed:\n\n' + out.toString())
+        }
+    }
+}
+
+compileJava.dependsOn(generateRakedevJooqSchemaSource)
+
+task copyToLib(type: Copy) {
+    into "$buildDir/libs"
+    from configurations.runtime.filter { !it.getName().contains("spigot") }
+}
+
+jar {
+    def classdeps = configurations.compile.collect { it.getName() } + configurations.compile.collect {
+        "libs/" + it.getName()
+    } + configurations.compile.collect { "../libs/" + it.getName() }
+
+    manifest {
+        attributes("Class-Path": classdeps.join(' '))
+    }
+}
+
+jar.dependsOn(copyToLib)

@@ -1,0 +1,48 @@
+enableMetrics: true
+sqlDialect: MARIADB
+hikariConfig:
+  allowPoolSuspension: false
+  autoCommit: false
+  catalog: null
+  connectionInitSql: null
+  connectionTestQuery: SELECT 1;
+  connectionTimeout: 30000
+  dataSource: null
+  dataSourceClassName: null
+  dataSourceJNDI: null
+  dataSourceProperties: {}
+  # MySQL: com.mysql.jdbc.Driver
+  # MariaDB: org.mariadb.jdbc.Driver
+  # PostgreSQL: org.postgresql.Driver
+  driverClassName: org.mariadb.jdbc.Driver
+  healthCheckProperties: {}
+  healthCheckRegistry: null
+  idleTimeout: 600000
+  initializationFailFast: true
+  initializationFailTimeout: 1
+  isolateInternalQueries: false
+  jdbc4ConnectionTest: false
+  jdbcUrl: jdbc:mariadb://localhost:3306/rakedev
+  # Five minutes.
+  leakDetectionThreshold: 300000
+  maxLifetime: 1800000
+  maximumPoolSize: 4
+  metricRegistry: null
+  metricsTrackerFactory: null
+  minimumIdle: 2
+  password: rakedev
+  poolName: rakedev
+  readOnly: false
+  registerMbeans: false
+  scheduledExecutor: null
+  scheduledExecutorService: null
+  schema: rakedev
+  threadFactory: null
+  #TRANSACTION_NONE
+  #TRANSACTION_READ_UNCOMMITTED (protecting against dirty reads)
+  #TRANSACTION_READ_COMMITTED (protecting against dirty and non-repeatable reads)
+  #TRANSACTION_REPEATABLE_READ
+  #TRANSACTION_SERIALIZABLE (protecting against dirty, non-repeatable reads and phantom reads)
+  transactionIsolation: TRANSACTION_SERIALIZABLE
+  username: rakedev
+  validationTimeout: 5000
