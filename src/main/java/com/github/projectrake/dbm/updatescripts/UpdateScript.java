@@ -1,7 +1,7 @@
-package com.projectrake.dbm.updatescripts;
+package com.github.projectrake.dbm.updatescripts;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.projectrake.dbm.api.v1.SQLScript;
+import com.github.projectrake.dbm.api.v1.SQLScript;
 
 import java.io.*;
 import java.util.jar.JarFile;

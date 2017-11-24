@@ -1,6 +1,6 @@
-package com.projectrake.dbm;
+package com.github.projectrake.dbm;
 
-import com.projectrake.dbm.api.v1.DatabaseInterface;
+import com.github.projectrake.dbm.api.v1.DatabaseInterface;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

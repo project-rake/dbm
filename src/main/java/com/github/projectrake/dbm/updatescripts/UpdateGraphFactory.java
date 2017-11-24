@@ -1,4 +1,4 @@
-package com.projectrake.dbm.updatescripts;
+package com.github.projectrake.dbm.updatescripts;
 
 import org.jgrapht.graph.DefaultDirectedGraph;
 

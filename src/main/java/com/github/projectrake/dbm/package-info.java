@@ -3,4 +3,4 @@
  * <p>
  * Base package containing all necessary plugin classes.
  */
-package com.projectrake.dbm;
+package com.github.projectrake.dbm;

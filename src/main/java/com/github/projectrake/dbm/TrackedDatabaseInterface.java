@@ -1,4 +1,4 @@
-package com.projectrake.dbm;
+package com.github.projectrake.dbm;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
@@ -10,7 +10,6 @@ import org.jooq.TransactionalRunnable;
 
 import java.util.Objects;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 /**

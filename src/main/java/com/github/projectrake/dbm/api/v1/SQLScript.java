@@ -1,4 +1,4 @@
-package com.projectrake.dbm.api.v1;
+package com.github.projectrake.dbm.api.v1;
 
 /**
  * Created on 20.11.2017.

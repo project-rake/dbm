@@ -2,6 +2,6 @@ name: dbm
 version: 0.1
 description: A database abstraction layer for plugins.
 author: psygate
-main: com.projectrake.dbm.DBManagerPlugin
+main: DBManagerPlugin
 prefix: dbm
 default-permission: op

@@ -1,4 +1,4 @@
-package com.projectrake.dbm;
+package com.github.projectrake.dbm;
 
 /*
  * Slightly modified version of the com.ibatis.common.jdbc.ScriptRunner class

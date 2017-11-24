@@ -3,4 +3,4 @@
  * <p>
  * This package contains the api for other plugins to use.
  */
-package com.projectrake.dbm.api;
+package com.github.projectrake.dbm.api;

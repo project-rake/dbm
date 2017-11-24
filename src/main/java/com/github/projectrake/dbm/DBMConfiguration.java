@@ -1,4 +1,4 @@
-package com.projectrake.dbm;
+package com.github.projectrake.dbm;
 
 import com.zaxxer.hikari.HikariConfig;
 import org.jooq.Configuration;

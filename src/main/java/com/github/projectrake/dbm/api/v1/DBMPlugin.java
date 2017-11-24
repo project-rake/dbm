@@ -1,4 +1,4 @@
-package com.projectrake.dbm.api.v1;
+package com.github.projectrake.dbm.api.v1;
 
 import java.io.IOException;
 import java.util.Collections;

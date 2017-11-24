@@ -4,4 +4,4 @@
  * This package contains the classes necessary to parse and execute SQL Scripts,
  * and all necessary classes for dependency resolution.
  */
-package com.projectrake.dbm.updatescripts;
+package com.github.projectrake.dbm.updatescripts;

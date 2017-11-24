@@ -1,13 +1,13 @@
-package com.projectrake.dbm;
+package com.github.projectrake.dbm;
 
 import com.codahale.metrics.MetricRegistry;
-import com.projectrake.dbm.api.v1.DBMPlugin;
-import com.projectrake.dbm.api.v1.DatabaseInterface;
-import com.projectrake.dbm.api.v1.SQLScript;
-import com.projectrake.dbm.jooq.Tables;
-import com.projectrake.dbm.updatescripts.UpdateGraph;
-import com.projectrake.dbm.updatescripts.UpdateGraphFactory;
-import com.projectrake.dbm.updatescripts.UpdateScript;
+import com.github.projectrake.dbm.api.v1.DBMPlugin;
+import com.github.projectrake.dbm.api.v1.DatabaseInterface;
+import com.github.projectrake.dbm.jooq.Tables;
+import com.github.projectrake.dbm.updatescripts.UpdateGraphFactory;
+import com.github.projectrake.dbm.api.v1.SQLScript;
+import com.github.projectrake.dbm.updatescripts.UpdateGraph;
+import com.github.projectrake.dbm.updatescripts.UpdateScript;
 import com.zaxxer.hikari.pool.HikariPool;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jooq.Configuration;
