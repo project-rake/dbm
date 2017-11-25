@@ -95,12 +95,18 @@ jooq {
 
             }
             target {
-                packageName = 'com.projectrake.dbm.jooq'
-
+                packageName = project.group + "." + project.name + ".jooq"
             }
         }
     }
 }
+
+task removeJOOQGen(type: Delete) {
+    delete "$buildDir/generated-src/jooq"
+    followSymlinks = true
+}
+
+generateRakedevJooqSchemaSource.dependsOn(removeJOOQGen)
 
 tasks.generateRakedevJooqSchemaSource.with {
     def out = new ByteArrayOutputStream()
