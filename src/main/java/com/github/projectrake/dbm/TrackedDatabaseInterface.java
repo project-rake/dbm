@@ -52,7 +52,7 @@ class TrackedDatabaseInterface extends UntrackedDatabaseInterface {
     }
 
     @Override
-    public void runQuery(TransactionalRunnable runnable) throws Throwable {
+    public void runQuery(TransactionalRunnable runnable)  {
         runQueryCounter.inc();
         Timer.Context ctx = runQueryTimer.time();
         try {
@@ -63,7 +63,7 @@ class TrackedDatabaseInterface extends UntrackedDatabaseInterface {
     }
 
     @Override
-    public <T> T callQuery(TransactionalCallable<T> transactionalCallable) throws Throwable {
+    public <T> T callQuery(TransactionalCallable<T> transactionalCallable)  {
         callQueryCounter.inc();
         Timer.Context ctx = callQueryTimer.time();
         T value;
@@ -77,7 +77,7 @@ class TrackedDatabaseInterface extends UntrackedDatabaseInterface {
     }
 
     @Override
-    public void asyncRunQuery(TransactionalRunnable runnable) throws Throwable {
+    public void asyncRunQuery(TransactionalRunnable runnable)  {
         asyncRunQueryCounter.inc();
         Timer.Context rctx = asyncRunQueryTimerToExec.time();
         super.asyncRunQuery((conf) -> {
@@ -92,7 +92,7 @@ class TrackedDatabaseInterface extends UntrackedDatabaseInterface {
     }
 
     @Override
-    public <T> CompletionStage<T> asyncCallQuery(TransactionalCallable<T> transactionalCallable) throws Throwable {
+    public <T> CompletionStage<T> asyncCallQuery(TransactionalCallable<T> transactionalCallable)  {
         asyncCallQueryCounter.inc();
         Timer.Context rctx = asyncCallQueryTimerToExec.time();
         return super.asyncCallQuery((conf) -> {

@@ -24,9 +24,9 @@ public abstract class DatabaseInterface {
      * @param transactionalCallable Transaction to run.
      * @param <T>                   Return type.
      * @return Returns a completion stage for the provided transaction.
-     * @throws Throwable Thrown on error.
+     * @ Thrown on error.
      */
-    public <T> CompletionStage<T> asyncCallQuery(TransactionalCallable<T> transactionalCallable) throws Throwable {
+    public <T> CompletionStage<T> asyncCallQuery(TransactionalCallable<T> transactionalCallable) {
         return getDSLContext().transactionResultAsync(getExecutorService(), transactionalCallable);
     }
 
@@ -36,9 +36,9 @@ public abstract class DatabaseInterface {
      * @param transactionalCallable This submits the query synchronously and waits for termination.
      * @param <T>                   Return type.
      * @return Returns an object of type T.
-     * @throws Throwable Thrown on error.
+     * @ Thrown on error.
      */
-    public <T> T callQuery(TransactionalCallable<T> transactionalCallable) throws Throwable {
+    public <T> T callQuery(TransactionalCallable<T> transactionalCallable) {
         return getDSLContext().transactionResult(transactionalCallable);
     }
 
@@ -46,9 +46,9 @@ public abstract class DatabaseInterface {
      * Query database without return.
      *
      * @param runnable Runnable to execute.
-     * @throws Throwable Thrown on error.
+     * @ Thrown on error.
      */
-    public void runQuery(TransactionalRunnable runnable) throws Throwable {
+    public void runQuery(TransactionalRunnable runnable) {
         getDSLContext().transaction(runnable);
     }
 
@@ -57,9 +57,9 @@ public abstract class DatabaseInterface {
      * Handling of submitted tasks may be out of order.
      *
      * @param runnable
-     * @throws Throwable
+     * @
      */
-    public void asyncRunQuery(TransactionalRunnable runnable) throws Throwable {
+    public void asyncRunQuery(TransactionalRunnable runnable) {
         getDSLContext().transactionAsync(getExecutorService(), runnable);
     }
 
@@ -68,56 +68,56 @@ public abstract class DatabaseInterface {
     /**
      * {@link #asyncCallQuery(TransactionalCallable)}
      */
-    public <T> CompletionStage<T> acq(TransactionalCallable<T> transactionalCallable) throws Throwable {
+    public <T> CompletionStage<T> acq(TransactionalCallable<T> transactionalCallable) {
         return asyncCallQuery(transactionalCallable);
     }
 
     /**
      * {@link #callQuery(TransactionalCallable)}
      */
-    public <T> T cq(TransactionalCallable<T> transactionalCallable) throws Throwable {
+    public <T> T cq(TransactionalCallable<T> transactionalCallable) {
         return callQuery(transactionalCallable);
     }
 
     /**
      * {@link #runQuery(TransactionalRunnable)}
      */
-    public void rq(TransactionalRunnable runnable) throws Throwable {
+    public void rq(TransactionalRunnable runnable) {
         runQuery(runnable);
     }
 
     /**
      * {@link #asyncRunQuery(TransactionalRunnable)}
      */
-    public void arq(TransactionalRunnable runnable) throws Throwable {
+    public void arq(TransactionalRunnable runnable) {
         asyncRunQuery(runnable);
     }
 
     /**
      * {@link #asyncCallQuery(TransactionalCallable)} with DSLContext passed instead of a configuration
      */
-    public <T> CompletionStage<T> acqd(DSLTransactionCallable<T> transactionalCallable) throws Throwable {
+    public <T> CompletionStage<T> acqd(DSLTransactionCallable<T> transactionalCallable) {
         return asyncCallQuery((conf) -> transactionalCallable.run(DSL.using(conf)));
     }
 
     /**
      * {@link #callQuery(TransactionalCallable)} with DSLContext passed instead of a configuration
      */
-    public <T> T cqd(DSLTransactionCallable<T> transactionalCallable) throws Throwable {
+    public <T> T cqd(DSLTransactionCallable<T> transactionalCallable) {
         return callQuery((conf) -> transactionalCallable.run(DSL.using(conf)));
     }
 
     /**
      * {@link #runQuery(TransactionalRunnable)} with DSLContext passed instead of a configuration
      */
-    public void rqd(DSLTransactionRunnable runnable) throws Throwable {
+    public void rqd(DSLTransactionRunnable runnable) {
         runQuery((conf) -> runnable.run(DSL.using(conf)));
     }
 
     /**
      * {@link #asyncRunQuery(TransactionalRunnable)} with DSLContext passed instead of a configuration
      */
-    public void arqd(DSLTransactionRunnable runnable) throws Throwable {
+    public void arqd(DSLTransactionRunnable runnable) {
         asyncRunQuery((conf) -> runnable.run(DSL.using(conf)));
     }
 
