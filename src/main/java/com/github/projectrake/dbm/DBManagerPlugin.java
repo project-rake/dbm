@@ -3,10 +3,11 @@ package com.github.projectrake.dbm;
 import com.codahale.metrics.MetricRegistry;
 import com.github.projectrake.dbm.api.v1.DBMPlugin;
 import com.github.projectrake.dbm.api.v1.DatabaseInterface;
-import com.github.projectrake.dbm.jooq.Tables;
-import com.github.projectrake.dbm.updatescripts.UpdateGraphFactory;
 import com.github.projectrake.dbm.api.v1.SQLScript;
+import com.github.projectrake.dbm.jooq.Tables;
+import com.github.projectrake.dbm.jooq.tables.records.DbmVersionsRecord;
 import com.github.projectrake.dbm.updatescripts.UpdateGraph;
+import com.github.projectrake.dbm.updatescripts.UpdateGraphFactory;
 import com.github.projectrake.dbm.updatescripts.UpdateScript;
 import com.zaxxer.hikari.pool.HikariPool;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -133,7 +135,6 @@ public class DBManagerPlugin extends JavaPlugin implements DBMPlugin {
 
         processUpdates(plugin, dbi, logger, pool, config.getSqlDialect());
 
-
         if (config.isEnableMetrics()) {
             plugin.setDatabaseInterface(new TrackedDatabaseInterface(executorService, jooqConfiguration, metrics, pluginName));
         } else {
@@ -148,48 +149,60 @@ public class DBManagerPlugin extends JavaPlugin implements DBMPlugin {
                 .orElseThrow(() -> new IllegalStateException("Cannot find any versions to upgrade to."));
 
         int currentVersion = getCurrentPluginVersion(plugin, dbi);
-        log.info("Searching path from " + currentVersion + " to " + maxVersion);
+        if (currentVersion != maxVersion) {
+            log.info("Searching path from " + currentVersion + " to " + maxVersion);
 
-        UpdateGraph graph = new UpdateGraphFactory().constructDependencyGraph(uscripts);
+            UpdateGraph graph = new UpdateGraphFactory().constructDependencyGraph(uscripts);
 
-        if (!graph.hasPath(currentVersion, maxVersion)) {
-            throw new IllegalStateException("Unable to construct update path from " + currentVersion + " to " + maxVersion + ".");
-        } else {
-            log.info("Constructed update path for " + plugin.getName());
-            String script = graph.getUpdateScript(currentVersion, maxVersion);
-            String SEPERATOR = IntStream.range(0, 80).mapToObj(v -> "-").reduce("", (a, b) -> a + b);
-            System.out.println(
-                    "\n" +
-                            SEPERATOR + "\n"
-                            + "-- CONSTRUCTED UPDATE SCRIPT\n"
-                            + SEPERATOR + "\n"
-                            + script + "\n"
-                            + SEPERATOR + "\n"
-                            + SEPERATOR + "\n"
-                            + "\n"
-                            + "-- Stop the server now if you don't want to run this."
-            );
+            if (!graph.hasPath(currentVersion, maxVersion)) {
+                throw new IllegalStateException("Unable to construct update path from " + currentVersion + " to " + maxVersion + ".");
+            } else {
+                log.info("Constructed update path for " + plugin.getName());
+                String script = graph.getUpdateScript(currentVersion, maxVersion);
+                String SEPERATOR = IntStream.range(0, 80).mapToObj(v -> "-").reduce("", (a, b) -> a + b);
+                System.out.println(
+                        "\n" +
+                                SEPERATOR + "\n"
+                                + "-- CONSTRUCTED UPDATE SCRIPT\n"
+                                + SEPERATOR + "\n"
+                                + script + "\n"
+                                + SEPERATOR + "\n"
+                                + SEPERATOR + "\n"
+                                + "\n"
+                                + "-- Stop the server now if you don't want to run this."
+                );
 
-            try {
-                Thread.sleep(5000);
-                String fname = plugin.getName() + ".dbm_update_script.latest.sql";
-                try (FileOutputStream out = new FileOutputStream(fname)) {
-                    out.write(script.getBytes("UTF-8"));
-                }
-                System.out.println("Dumped to \"" + fname + "\"");
-                try (Connection con = pool.getConnection()) {
-                    new ScriptRunner(con, false, true).runScript(new StringReader(script));
-                    con.commit();
-                    System.out.println("Update script run.");
-                } catch (SQLException e) {
+                try {
+                    Thread.sleep(5000);
+                    String fname = plugin.getName() + ".dbm_update_script.latest.sql";
+                    try (FileOutputStream out = new FileOutputStream(fname)) {
+                        out.write(script.getBytes("UTF-8"));
+                    }
+                    System.out.println("Dumped to \"" + fname + "\"");
+                    try (Connection con = pool.getConnection()) {
+                        new ScriptRunner(con, false, true).runScript(new StringReader(script));
+                        con.commit();
+                        System.out.println("Update script run.");
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
+            dbi.rqd(ctx -> {
+                if (currentVersion == -1) {
+                    DbmVersionsRecord rec = new DbmVersionsRecord(plugin.getName(), maxVersion, new Timestamp(System.currentTimeMillis()));
+                    ctx.insertInto(Tables.DBM_VERSIONS).set(rec).execute();
+                } else {
+                    ctx.update(Tables.DBM_VERSIONS).set(Tables.DBM_VERSIONS.VERSION, maxVersion)
+                            .where(Tables.DBM_VERSIONS.PLUGIN_NAME.eq(plugin.getName()))
+                            .execute();
+                }
+            });
         }
     }
 
