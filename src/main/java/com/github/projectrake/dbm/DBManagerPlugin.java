@@ -224,6 +224,15 @@ public class DBManagerPlugin extends JavaPlugin implements DBMPlugin {
         return instance;
     }
 
+    /**
+     * Returns the instance of this plugin. If this plugin has not been initialized, this will return null.
+     *
+     * @return The instance of this plugin.
+     */
+    public static DBManagerPlugin getInstanceChecked() {
+        return Objects.requireNonNull(instance, "Instance of DBManagerPlugin NOT INITIALIZED.");
+    }
+
     @Override
     public void setDatabaseInterface(DatabaseInterface dbinterface) {
         dbi = dbinterface;
