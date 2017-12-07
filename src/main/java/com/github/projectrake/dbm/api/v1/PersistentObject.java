@@ -11,20 +11,86 @@ public abstract class PersistentObject {
     private PersistentObjectState state = NEW;
     private PersistentObjectState preDeletionState = UNDEFINED;
 
+    /**
+     * Sets state to dirty, and throws an exception if this is not possible from the current state.
+     */
     public void setStateDirty() {
         assertNotDeleted();
         assertNotNew(DIRTY);
         setState(DIRTY);
     }
 
+    /**
+     * Sets state to dirty, and ignores the call if this is not possible from the current state.
+     */
+    public void trySetStateDirty() {
+        if (state != DELETED && state != NEW) {
+            setStateDirty();
+        }
+    }
+
+    /**
+     * Sets state to clean, and throws an exception if this is not possible from the current state.
+     */
     public void setStateClean() {
         assertNotDeleted();
         setState(CLEAN);
     }
 
+    /**
+     * Sets state to clean, and ignores the call if this is not possible from the current state.
+     */
+    public void trySetStateClean() {
+        if (state != DELETED) {
+            setStateClean();
+        }
+    }
+
+    /**
+     * Sets state to deleted, and throws an exception if this is not possible from the current state.
+     */
     public void setStateDeleted() {
         assertNotNew(DELETED);
+        preDeletionState = state;
         setState(DELETED);
+    }
+
+    /**
+     * Sets state to deleted, and ignores the call if this is not possible from the current state.
+     */
+    public void trySetStateDeleted() {
+        if (state != NEW) {
+            setStateDeleted();
+        }
+    }
+
+    public boolean isNew() {
+        return getState() == NEW;
+    }
+
+    public boolean isClean() {
+        return getState() == CLEAN;
+    }
+
+    public boolean isDirty() {
+        return getState() == DIRTY;
+    }
+
+    public boolean isDeleted() {
+        return getState() == DELETED;
+    }
+
+    public boolean isNotDeleted() {
+        return getState() == DELETED;
+    }
+
+    /**
+     * Checks for deletion state. If this object is in deletion state, this will throw an {@link IllegalStateException}
+     */
+    public void checkNotDeleted() {
+        if (isDeleted()) {
+            throw new IllegalStateException("Object already deleted. This might be a bug.");
+        }
     }
 
     public void resurrect() {
